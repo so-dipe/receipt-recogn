@@ -5,7 +5,7 @@ from io import BytesIO
 from azure_read import recognize_text
 
 ENDPOINT = "https://reciept-recogn.cognitiveservices.azure.com/"
-SUB_KEY = "7aca8e57fee94c4ea586c4fb16e421be"
+SUB_KEY = "..."
 
 # Display a file uploader widget
 uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
