@@ -1,38 +1,9 @@
-# from typing import List
-# from azure.cognitiveservices.vision.computervision import ComputerVisionClient
-# from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes
-# from msrest.authentication import CognitiveServicesCredentials
-# from io import BytesIO
-
-# def recognize_text(image_file, subscription_key, endpoint):
-#     computervision_client = ComputerVisionClient(endpoint, CognitiveServicesCredentials(subscription_key))
-
-#     image_data = BytesIO(image_file.read())
-
-#     read_response = computervision_client.read_in_stream(image_data, raw=True)
-
-#     read_operation_location = read_response.headers["Operation-Location"]
-#     operation_id = read_operation_location.split("/")[-1]
-
-#     while True:
-#         read_result = computervision_client.get_read_result(operation_id)
-#         if read_result.status not in ['notStarted', 'running']:
-#             break
-#         # time.sleep(1)
-
-#     results = []
-#     if read_result.status == OperationStatusCodes.succeeded:
-#         for text_result in read_result.analyze_result.read_results:
-#             for line in text_result.lines:
-#                 results.append(line.text)
-
-#     return results
-
 from azure.cognitiveservices.vision.computervision import ComputerVisionClient
 from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes
 from msrest.authentication import CognitiveServicesCredentials
 from io import BytesIO
-from time import time
+from PIL import Image, ImageDraw
+
 
 def recognize_text(subscription_key, endpoint, uploaded_file):
     # Create a ComputerVisionClient object
@@ -57,10 +28,25 @@ def recognize_text(subscription_key, endpoint, uploaded_file):
         # time.sleep(1)
 
     # Print the detected text, line by line
-    results = []
+    text = ""
+    lines = []
+    bounding_boxes = []
     if read_result.status == OperationStatusCodes.succeeded:
         for text_result in read_result.analyze_result.read_results:
             for line in text_result.lines:
-                results.append(line.text)
+                text += line.text + '\n'
+                lines.append(line.text)
+                bounding_boxes.append(line.bounding_box)
 
-    return results
+    return text, lines, bounding_boxes
+
+def plot_bounding_boxs(bounding_boxes, image, thickness=5):
+    for bounding_box in bounding_boxes:
+        start_point = bounding_box[:2]
+        start_point = [int(x) for x in start_point]
+        end_point = bounding_box[4:6]
+        end_point = [int(x) for x in end_point]
+        bbox = start_point + end_point
+        draw = ImageDraw.Draw(image)
+        draw.rectangle(bbox, outline="green")
+    return image
