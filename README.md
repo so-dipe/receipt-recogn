@@ -1,3 +1,3 @@
 # Document Recognition
 
-This repo uses azure READ for document recognition. It is still a work in progress. :zzz:
+This repo contains code that uses azure READ for document recognition. It is still a work in progress. :zzz:
